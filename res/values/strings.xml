@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    
+    <!-- ##############################华丽丽的分割线############################ -->
+    <string name="app_name">悦动</string>
+    <string name="exit">彻底退出</string>
+    <string name="make_music_simple">让音乐悦人心动</string>
+    <string name="lyric_empty">暂无歌词</string>
+    <string name="tab_bar_playing">悦 动</string>
+    <string name="tab_bar_local">播放列表</string>
+    <string name="tab_bar_online">本地音乐</string>
+    <string name="num_of_local_music">共有%d首歌曲</string>
+    <string name="select_music">共有%1$d首歌曲，已选择%2$d首</string>
+    <string name="default_select_music">共有0首歌曲，已选择0首</string>
+    <string name="local_music_is_empty">暂未找到本地音乐</string>
+    <string name="playlist">播放列表</string>
+    <string name="import_music">导入歌曲</string>
+    <string name="import_local_music">导入本地歌曲</string>
+    <string name="play_list_my_favorite">我最喜欢</string>
+    <string name="volume_control">音量控制</string>
+    <string name="sdcard">SDCARD</string>
+    <string name="default_song_title">歌曲名</string>
+    <string name="default_song_artist">艺术家</string>
+    <string name="label_select_all">全选</string>
+    <string name="label_finish">完成</string>
+    <string name="label_list_name">LIST NAME</string>
+    <string name="label_new_list">新建列表</string>
+    <string name="default_song_duration_formated">00:00</string>
+    <string name="default_song_num">0</string>
+    <string name="play_list_empty">播放列表为空！</string>
+    <string name="edit_text_hint">新建列表</string>
+    <string name="dialog_title_new_list">请输入列表名称</string>
+    <string name="dialog_bt_confirm">确认</string>
+    <string name="dialog_bt_cancel">取消</string>
+    <string name="play_list_name_empty_error">列表名不能为空！</string>
+    <string name="play_list_name_conflict_error">列表名不能重复！</string>
+    <string name="select_music_empty">您还未选择任何歌曲！</string>
+    <string name="play_mode_shuffle">随机模式</string>
+    <string name="play_mode_list_once">顺序播放</string>
+    <string name="play_mode_loop_list">列表循环</string>
+    <string name="play_mode_loop_single">单曲循环</string>
+    <string name="delete_item">删除</string>
+    <string name="not_song_is_playing">暂无播放歌曲</string>
+    <string name="content_description">简乐</string>
+    <string name="about_app">关于简乐</string>
+    <string name="about_author">关于作者 - Ryan Hoo</string>
+    <string name="about_declare">郑重声明</string>
+    <string name="what_is_this">简乐秉承极简主义宗旨，您无需被众多繁杂功能所困扰，也无需烦心泛滥的网络广告。让听音乐变成一件更简单的事情。试想一个阳光明媚的午后，倒上一杯清茶，听着清新的音乐，生活岂不惬意？让音乐更简单，简乐为此而生。</string>
+    <string name="what_is_author">十年磨一剑，立地成大牛。他正深居简出，日夜奋战，为此努力。可通过以下方式联系他：</string>
+    <string name="what_is_declare">简乐承诺：永久免费，永不投放广告，请放心使用。应用所用素材均来自互联网搜集，如有侵犯您的权益，请及时告知。</string>
+    <string name="contact_blog">博 客 ： http://my.oschina.net/ryanhoo</string>
+    <string name="contact_weibo">微 博 ： http://weibo.com/sanyufang</string>
+    <string name="contact_email">Email ： ryan.hoo.j@gmail.com</string>
+    <string name="contact_github">GitHub ： https://github.com/ryanhoo</string>
+    <string name="copyright">© 2013 Ryan Hoo</string>
+    
+</resources>

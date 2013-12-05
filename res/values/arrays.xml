@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="tab_title">
+        <item>悦动</item>
+        <item>播放列表</item>
+        <item>本地音乐</item>
+        
+    </string-array>
+</resources>
