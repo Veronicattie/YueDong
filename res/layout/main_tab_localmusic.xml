@@ -43,6 +43,8 @@
         android:id="@+id/localmusic_lv_musiclist"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:divider="@color/main_blue_light"
+        android:dividerHeight="1dp"
         ></ListView>
 
 </LinearLayout>

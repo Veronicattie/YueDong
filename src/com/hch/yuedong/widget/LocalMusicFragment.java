@@ -14,7 +14,8 @@ import com.actionbarsherlock.app.SherlockFragment;
 import com.hch.yuedong.R;
 import com.hch.yuedong.adapter.LocalMusicListAdapter;
 import com.hch.yuedong.entity.Music;
-import com.hch.yuedong.util.MusicUtil;
+import com.hch.yuedong.manage.MusicDB;
+import com.hch.yuedong.util.FontUtil;
 
 public class LocalMusicFragment extends SherlockFragment{
 	
@@ -25,8 +26,9 @@ public class LocalMusicFragment extends SherlockFragment{
 			Bundle savedInstanceState) {
 		
 		View contextView = inflater.inflate(R.layout.main_tab_localmusic, container, false);
-		list =MusicUtil.scanAllAudioFiles(contextView.getContext());
+		list =MusicDB.scanAllAudioFiles(contextView.getContext());
 		initTotalMusicView(contextView);
+		initListView(contextView);
 		return contextView;
 	}
 	
@@ -35,6 +37,8 @@ public class LocalMusicFragment extends SherlockFragment{
 		int size = list.size();
 		String text = totalmusic.getText().toString();
 		totalmusic.setText(String.format(text, size));
+		FontUtil fontUtil = new FontUtil();
+		fontUtil.changeViewSize((ViewGroup)contextView);
 	}
 	
 	public void initListView(View contextView){

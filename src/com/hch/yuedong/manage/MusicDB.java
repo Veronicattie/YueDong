@@ -1,6 +1,8 @@
-package com.hch.yuedong.util;
+package com.hch.yuedong.manage;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import com.hch.yuedong.entity.Music;
@@ -8,8 +10,10 @@ import com.hch.yuedong.entity.Music;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
+import android.renderscript.Long2;
+import android.text.format.DateFormat;
 
-public class MusicUtil {
+public class MusicDB {
 	public static ArrayList<Music> scanAllAudioFiles(Context context) {
 		ArrayList<Music> mylist = new ArrayList<Music>();
 		// 查询媒体数据库
@@ -33,6 +37,9 @@ public class MusicUtil {
 				// 歌曲的歌手名： MediaStore.Audio.Media.ARTIST
 				String artist = cursor.getString(cursor
 						.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
+				if("<unknown>".equals(artist)){
+					artist="未知艺术家";
+				}
 				// 歌曲文件的路径 ：MediaStore.Audio.Media.DATA
 				String url = cursor.getString(cursor
 						.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
@@ -40,6 +47,7 @@ public class MusicUtil {
 				int duration = cursor
 						.getInt(cursor
 								.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
+				String str_duration = long2Date("mm:ss",duration);
 				// 歌曲文件的大小 ：MediaStore.Audio.Media.SIZE
 				Long size = cursor.getLong(cursor
 						.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE));
@@ -52,6 +60,7 @@ public class MusicUtil {
 					music.setArtist(artist);
 					music.setUrl(url);
 					music.setDuration(duration);
+					music.setStr_duration(str_duration);
 					music.setSize(size);
 					mylist.add(music);
 				}
@@ -59,5 +68,12 @@ public class MusicUtil {
 			}
 		}
 		return mylist;
+	}
+	
+	public static String long2Date(String format,long value){
+		SimpleDateFormat dateformat = new SimpleDateFormat("mm:ss");
+		Date date = new Date(value);
+		String result = dateformat.format(date);
+		return result;
 	}
 }

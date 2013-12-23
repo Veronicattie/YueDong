@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.hch.yuedong.R;
 import com.hch.yuedong.entity.Music;
-
+import com.hch.yuedong.util.FontUtil;
 
 import android.content.Context;
 import android.util.Log;
@@ -19,10 +19,12 @@ public class LocalMusicListAdapter extends BaseAdapter{
 
 	List<Music> list = new ArrayList<Music>();
 	Context context = null;
+	FontUtil fontUtil;
 	
 	public LocalMusicListAdapter(Context context,List<Music> list){
 		this.list = list;
-		context = context;
+		this.context = context;
+		fontUtil = new FontUtil();
 	}
 	
 	@Override
@@ -46,16 +48,16 @@ public class LocalMusicListAdapter extends BaseAdapter{
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder viewHolder = null;
-		Log.e("创建一行", "创建一行");
-		if(convertView!=null){
+		if(convertView==null){
 			viewHolder = new ViewHolder();
 			LayoutInflater mInflater = LayoutInflater.from(context);
-			convertView = mInflater.inflate(R.layout.listitem_localmusiclist, null);
+			convertView = mInflater.inflate(R.layout.listitem_localmusic, null);
 			
 			viewHolder.name = (TextView) convertView.findViewById(R.id.item_tv_musicname);
 			viewHolder.artist = (TextView) convertView.findViewById(R.id.item_tv_artist);
 			viewHolder.duration = (TextView) convertView.findViewById(R.id.item_tv_duration);
 			convertView.setTag(viewHolder);
+			fontUtil.changeViewSize((ViewGroup)convertView);
 		}else{
 			viewHolder = (ViewHolder) convertView.getTag();
 		}
@@ -63,9 +65,11 @@ public class LocalMusicListAdapter extends BaseAdapter{
 		if(music!=null){
 			viewHolder.name.setText(music.getName());
 			viewHolder.artist.setText(music.getArtist());
-			viewHolder.duration.setText(music.getDuration());
+			String duration = music.getStr_duration();
+			viewHolder.duration.setText(duration);
 		}
-		return null;
+		
+		return convertView;
 	}
 	
 	private static class ViewHolder{

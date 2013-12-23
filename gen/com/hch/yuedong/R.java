@@ -1028,34 +1028,39 @@ containing a value of this type.
         public static final int abs__textButton=0x7f040013;
         public static final int abs__title=0x7f04001b;
         public static final int abs__up=0x7f04000b;
-        public static final int action_settings=0x7f040042;
+        public static final int action_settings=0x7f040047;
         public static final int disableHome=0x7f040009;
         public static final int edit_query=0x7f040026;
         public static final int homeAsUp=0x7f040006;
         public static final int item_tv_artist=0x7f040034;
         public static final int item_tv_duration=0x7f040035;
         public static final int item_tv_musicname=0x7f040033;
+        public static final int item_tv_playlistname=0x7f040036;
+        public static final int item_tv_totalmusic=0x7f040037;
         public static final int listMode=0x7f040002;
-        public static final int list_play_lists=0x7f04003a;
-        public static final int localmusic_lv_musiclist=0x7f040037;
-        public static final int localmusic_tv_totalmusic=0x7f040036;
-        public static final int miniplayer_iv_cd=0x7f040040;
-        public static final int miniplayer_set_as_favor=0x7f04003d;
-        public static final int miniplayer_tv_album=0x7f04003f;
-        public static final int miniplayer_tv_mname=0x7f04003c;
-        public static final int miniplayer_tv_singer=0x7f04003e;
+        public static final int localmusic_lv_musiclist=0x7f040039;
+        public static final int localmusic_tv_totalmusic=0x7f040038;
+        public static final int miniplayer_iv_cd=0x7f040042;
         public static final int normal=0x7f040001;
-        public static final int pb_loading=0x7f040039;
+        public static final int playlist_iv_empty=0x7f04003d;
+        public static final int playlist_linear_newplaylist=0x7f04003a;
+        public static final int playlist_lv_list=0x7f04003c;
+        public static final int playlist_pb_loading=0x7f04003b;
         public static final int showCustom=0x7f040008;
         public static final int showHome=0x7f040005;
         public static final int showTitle=0x7f040007;
-        public static final int skb_progress=0x7f040041;
         public static final int tabMode=0x7f040003;
-        public static final int tv_list_empty=0x7f04003b;
         public static final int useLogo=0x7f040004;
         public static final int viewPager=0x7f040032;
-        public static final int view_new_play_list=0x7f040038;
         public static final int wrap_content=0x7f040000;
+        public static final int yuedong_ib_set_as_favor=0x7f04003f;
+        public static final int yuedong_iv_play=0x7f040044;
+        public static final int yuedong_iv_play_last=0x7f040043;
+        public static final int yuedong_iv_play_next=0x7f040045;
+        public static final int yuedong_skb_progress=0x7f040046;
+        public static final int yuedong_tv_album=0x7f040041;
+        public static final int yuedong_tv_artist=0x7f040040;
+        public static final int yuedong_tv_music_name=0x7f04003e;
     }
     public static final class integer {
         public static final int abs__max_action_buttons=0x7f080000;
@@ -1083,12 +1088,14 @@ containing a value of this type.
         public static final int abs__search_view=0x7f030013;
         public static final int abs__simple_dropdown_hint=0x7f030014;
         public static final int ac_main=0x7f030015;
-        public static final int listitem_localmusiclist=0x7f030016;
-        public static final int main_tab_localmusic=0x7f030017;
-        public static final int main_tab_playlist=0x7f030018;
-        public static final int main_tab_yuedong=0x7f030019;
-        public static final int sherlock_spinner_dropdown_item=0x7f03001a;
-        public static final int sherlock_spinner_item=0x7f03001b;
+        public static final int listitem_localmusic=0x7f030016;
+        public static final int listitem_localmusiclist=0x7f030017;
+        public static final int listitem_playlist=0x7f030018;
+        public static final int main_tab_localmusic=0x7f030019;
+        public static final int main_tab_playlist=0x7f03001a;
+        public static final int main_tab_yuedong=0x7f03001b;
+        public static final int sherlock_spinner_dropdown_item=0x7f03001c;
+        public static final int sherlock_spinner_item=0x7f03001d;
     }
     public static final class menu {
         public static final int main=0x7f0c0000;
@@ -2354,7 +2361,7 @@ containing a value of this type.
          */
         public static final int[] SherlockSpinner = {
             0x010100af, 0x01010175, 0x01010176, 0x0101017b,
-            0x01010262, 0x010102ac, 0x010102ad, 0x0101041f
+            0x01010262, 0x010102ac, 0x010102ad, 0x010103fd
         };
         /**
           <p>

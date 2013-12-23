@@ -15,6 +15,8 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 import com.hch.yuedong.R;
 import com.hch.yuedong.adapter.TabPagerAdapter;
+import com.hch.yuedong.entity.Music;
+import com.hch.yuedong.manage.MusicDB;
 import com.hch.yuedong.widget.LocalMusicFragment;
 import com.hch.yuedong.widget.PlayListFragment;
 import com.hch.yuedong.widget.YueDongFragment;
@@ -45,12 +47,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.ac_main);
-		//initViewData();
-		//initView();
 		init();
-		//getContentResolver();
-		
 	}
+	
 
 	public void init() {
 		// 将Fragment加入List中
@@ -67,7 +66,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 		mViewPager.setAdapter(new TabPagerAdapter(getSupportFragmentManager(),
 				mFragmentList));
 		mViewPager.setOnPageChangeListener(this);
-
+		
+		
 		//设置ActionBar
 		mActionBar = getSupportActionBar();
 		mActionBar.setDisplayShowTitleEnabled(false);
