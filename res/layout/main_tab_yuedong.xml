@@ -97,6 +97,7 @@
             android:padding="8dp" >
 
             <ImageView
+                android:id="@+id/yuedong_iv_voice"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
@@ -131,6 +132,7 @@
                 />
 
             <ImageView
+                android:id="@+id/yuedong_iv_play_mode"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
@@ -148,6 +150,7 @@
              >
 
             <TextView
+                android:id="@+id/yuedong_tv_current_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
@@ -161,10 +164,11 @@
                 android:layout_width="0.0dip"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.0"
-                android:paddingLeft="5.0dip"
-                android:paddingRight="5.0dip" />
+                android:paddingLeft="12.0dip"
+                android:paddingRight="12.0dip" />
 
             <TextView
+                android:id="@+id/yuedong_tv_duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="true"

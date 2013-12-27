@@ -1028,7 +1028,7 @@ containing a value of this type.
         public static final int abs__textButton=0x7f040013;
         public static final int abs__title=0x7f04001b;
         public static final int abs__up=0x7f04000b;
-        public static final int action_settings=0x7f040047;
+        public static final int action_settings=0x7f04004b;
         public static final int disableHome=0x7f040009;
         public static final int edit_query=0x7f040026;
         public static final int homeAsUp=0x7f040006;
@@ -1054,12 +1054,16 @@ containing a value of this type.
         public static final int viewPager=0x7f040032;
         public static final int wrap_content=0x7f040000;
         public static final int yuedong_ib_set_as_favor=0x7f04003f;
-        public static final int yuedong_iv_play=0x7f040044;
-        public static final int yuedong_iv_play_last=0x7f040043;
-        public static final int yuedong_iv_play_next=0x7f040045;
-        public static final int yuedong_skb_progress=0x7f040046;
+        public static final int yuedong_iv_play=0x7f040045;
+        public static final int yuedong_iv_play_last=0x7f040044;
+        public static final int yuedong_iv_play_mode=0x7f040047;
+        public static final int yuedong_iv_play_next=0x7f040046;
+        public static final int yuedong_iv_voice=0x7f040043;
+        public static final int yuedong_skb_progress=0x7f040049;
         public static final int yuedong_tv_album=0x7f040041;
         public static final int yuedong_tv_artist=0x7f040040;
+        public static final int yuedong_tv_current_time=0x7f040048;
+        public static final int yuedong_tv_duration=0x7f04004a;
         public static final int yuedong_tv_music_name=0x7f04003e;
     }
     public static final class integer {

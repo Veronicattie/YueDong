@@ -8,17 +8,17 @@ import android.provider.MediaStore;
 
 public class Music implements Parcelable{
 
-	public int id;
-	public String name;
-	public String album;
-	public String artist;
-	public String url;
+	private int id;
+	private String name;
+	private String album;
+	private String artist;
+	private String url;
 	//歌曲总播放时长
-	public int duration;
-	public String str_duration;
-	public Long size;
+	private int duration;
+	private String str_duration;
+	private Long size;
 	//默认没有播放列表
-	public int playlistId=-1;
+	private int playlistId=-1;
 	public int getId() {
 		return id;
 	}

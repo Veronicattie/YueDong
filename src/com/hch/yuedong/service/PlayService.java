@@ -21,9 +21,12 @@ import android.util.Log;
 public class PlayService extends Service {
 
 	public static final String MUSIC_COMPLETED = "com.hch.yuedong.music_completed";
+	public static final String MUSIC_PLAYING = "com.hch.yuedong.music_playing";
 	private static final String TAG = "PlayService";
 	private MediaPlayer mp;
 	private Music currentMusic = null;
+	private int currentPlayTimeFromAC = 0;
+	private int currentPlayTime = 0;
 	ArrayList<Music> list = new ArrayList<Music>();
 
 	@Override
@@ -44,9 +47,11 @@ public class PlayService extends Service {
 		boolean playing = intent.getBooleanExtra("playing", false);
 		currentMusic = intent.getParcelableExtra("music");
 		list = intent.getParcelableArrayListExtra("list");
+		currentPlayTimeFromAC = intent.getIntExtra("currentPlayTime", 0);
 		Log.i(TAG, "list.size():"+list.size());
 		if (playing) {
 			// 现在在播就暂停
+			currentPlayTime=mp.getCurrentPosition();
 			mp.pause();
 		} else {
 			playMusic(currentMusic.getUrl());
@@ -62,6 +67,12 @@ public class PlayService extends Service {
 	 *            音乐文件所在的路径
 	 */
 	private void playMusic(String musicPath) {
+		if(currentPlayTimeFromAC!=0){
+			//重新播放已暂停的歌曲
+			Log.e("重新播放", currentPlayTime+"");
+			//mp.seekTo(currentPlayTime);
+			mp.start();
+		}else{
 		try {
 			// 重置mediaPlayer实例，reset之后处于空闲状态
 			mp.reset();
@@ -87,6 +98,26 @@ public class PlayService extends Service {
 			mp.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
 		} catch (Exception e) {
 			Log.e(TAG, "playMusic error " + e);
+		}
+		}
+	}
+	
+	private void playCurrent(){
+		while (true) {
+//			int currentDuration = mp.getCurrentPosition();
+//				sendBroadcast(new Intent(
+//						MediaPlayerManager.BROADCASTRECEVIER_ACTON)
+//						.putExtra("flag",
+//								MediaPlayerManager.FLAG_CHANGED)
+//						.putExtra("currentPosition", currentDuration)
+//						.putExtra("duration", mPlayer.getDuration()));
+//				updateWidget(false,currentDuration,mPlayer.getDuration());
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		}
 	}
 

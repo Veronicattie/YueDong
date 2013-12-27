@@ -47,7 +47,7 @@ public class MusicDB {
 				int duration = cursor
 						.getInt(cursor
 								.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
-				String str_duration = long2Date("mm:ss",duration);
+				String str_duration = long2Date(duration);
 				// 歌曲文件的大小 ：MediaStore.Audio.Media.SIZE
 				Long size = cursor.getLong(cursor
 						.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE));
@@ -70,7 +70,7 @@ public class MusicDB {
 		return mylist;
 	}
 	
-	public static String long2Date(String format,long value){
+	public static String long2Date(long value){
 		SimpleDateFormat dateformat = new SimpleDateFormat("mm:ss");
 		Date date = new Date(value);
 		String result = dateformat.format(date);

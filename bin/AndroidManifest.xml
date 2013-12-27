@@ -23,7 +23,7 @@
             android:name="com.hch.yuedong.ui.MainActivity"
             android:label="@string/app_name"
              android:theme="@style/Themes.ActionBarTab"
-            
+            android:screenOrientation="portrait" 
              >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

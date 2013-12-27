@@ -2,6 +2,7 @@ package com.hch.yuedong.widget;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 import java.util.TimerTask;
 
 import android.content.BroadcastReceiver;
@@ -14,6 +15,7 @@ import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -49,10 +51,15 @@ public class YueDongFragment extends SherlockFragment implements
 	ImageView iv_play = null;
 	ImageView iv_play_next = null;
 	ImageView iv_play_last = null;
+	ImageView iv_play_mode = null;
+	ImageView iv_voice = null;
 	TextView tv_music_name = null;
 	TextView tv_artist = null;
 	TextView tv_album = null;
-	public static SeekBar skb_progress = null;
+	TextView tv_duration = null;
+	TextView tv_current_time = null;
+	SeekBar skb_progress = null;
+	
 
 	Context context = null;
 	MediaPlayer mediaPlayer = null;
@@ -65,6 +72,9 @@ public class YueDongFragment extends SherlockFragment implements
 	// 默认播放列表中的第一首歌
 	private Music currentMusic = null;
 	private boolean playing = false;
+	private int currentPlayTime=0;
+	private int currentDuration = 0;
+	private Timer timer;
 	
 	
 
@@ -86,6 +96,12 @@ public class YueDongFragment extends SherlockFragment implements
 		// 将当前音乐的信息记录到sp中去，因为用户可能就直接退出了
 	}
 	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		if(timer!=null)
+		timer.cancel();
+	}
 	
 	public void initData(View contextView){
 		context = contextView.getContext();
@@ -105,15 +121,21 @@ public class YueDongFragment extends SherlockFragment implements
 		iv_play = (ImageView) view.findViewById(R.id.yuedong_iv_play);
 		iv_play_next = (ImageView) view.findViewById(R.id.yuedong_iv_play_next);
 		iv_play_last = (ImageView) view.findViewById(R.id.yuedong_iv_play_last);
+		iv_voice = (ImageView) view.findViewById(R.id.yuedong_iv_voice);
+		iv_play_mode = (ImageView) view.findViewById(R.id.yuedong_iv_play_mode);
 		tv_music_name = (TextView) view
 				.findViewById(R.id.yuedong_tv_music_name);
 		tv_artist = (TextView) view.findViewById(R.id.yuedong_tv_artist);
 		tv_album = (TextView) view.findViewById(R.id.yuedong_tv_album);
+		tv_duration = (TextView) view.findViewById(R.id.yuedong_tv_duration);
+		tv_current_time = (TextView) view.findViewById(R.id.yuedong_tv_current_time);
 		skb_progress = (SeekBar) view.findViewById(R.id.yuedong_skb_progress);
 		ib_set_as_favor.setOnClickListener(this);
 		iv_play.setOnClickListener(this);
 		iv_play_next.setOnClickListener(this);
 		iv_play_last.setOnClickListener(this);
+		iv_voice.setOnClickListener(this);
+		iv_play_mode.setOnClickListener(this);
 		
 		DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
 		FontUtil.screenHeight = displayMetrics.heightPixels;
@@ -140,26 +162,17 @@ public class YueDongFragment extends SherlockFragment implements
 		tv_music_name.setText(currentMusic.getName());
 		tv_artist.setText(currentMusic.getArtist());
 		tv_album.setText(currentMusic.getAlbum());
-		skb_progress.setMax(music.getDuration());
-		
+		tv_duration.setText(currentMusic.getStr_duration());
+		skb_progress.setMax(currentDuration);
 	}
 
-	private TimerTask durationTime = new TimerTask() {
-		
-		@Override
-		public void run() {
-			
-		}
-	};
 	
 	@Override
 	public void onClick(View view) {
-		int currentMusicIndex = 0;
 		switch (view.getId()) {
 		case R.id.yuedong_ib_set_as_favor:
 			break;
 		case R.id.yuedong_iv_play:
-			setMusicData(currentMusic);
 			play();
 			break;
 		case R.id.yuedong_iv_play_last:
@@ -172,20 +185,53 @@ public class YueDongFragment extends SherlockFragment implements
 	}
 
 	private void play() {
+		
 		serviceIntent = new Intent(context, PlayService.class);
 		serviceIntent.putExtra("music", currentMusic);
 		serviceIntent.putExtra("playing", playing);
+		serviceIntent.putExtra("currentPlayTime", currentPlayTime);
 		serviceIntent.putParcelableArrayListExtra("list", list);
 		context.startService(serviceIntent);
 		if (playing) {// 当前是正在播放的,歌曲将暂停，图标将变成使音乐播放
 			playing = false;
 			iv_play.setImageResource(R.drawable.selector_play);
+			if(timer!=null){timer.cancel();}
 		} else {// 当前是暂停状态的，歌曲将播放，图标将变成使音乐暂停
 			playing = true;
 			iv_play.setImageResource(R.drawable.selector_stop);
+			startAutoPlay();
 		}
 		setMusicData(currentMusic);
 	}
+
+	public void startAutoPlay() {
+		
+		timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				if(currentPlayTime!=currentDuration){
+					currentPlayTime=currentPlayTime+1000;
+					//设置进度条的当前时间
+					handler.post(new Runnable() {
+						@Override
+						public void run() {
+							
+								setPlayingMusicData();
+						}
+					});
+				}
+			}
+		}, 1000, 1000);
+	}
+	
+	private void setPlayingMusicData(){
+		skb_progress.setProgress(currentPlayTime);
+		String time = MusicDB.long2Date(currentPlayTime);
+		tv_current_time.setText(time);
+	}
+	
+	private Handler handler = new Handler();
 
 	public class PlayReciever extends BroadcastReceiver {
 
@@ -193,6 +239,8 @@ public class YueDongFragment extends SherlockFragment implements
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
 			if (action.equals(PlayService.MUSIC_COMPLETED)) {
+				if(timer!=null){timer.cancel();}
+				currentPlayTime=0;
 				// 当前歌曲播放完成，自动跳到下一曲
 				playNextMusic();
 			}
@@ -208,22 +256,31 @@ public class YueDongFragment extends SherlockFragment implements
 		if (++currentMusicIndex >= list.size()) {
 			currentMusicIndex = 0;
 		}
-		currentMusic = list.get(currentMusicIndex);
-		playing = false;
+		resetPlayParam(currentMusicIndex);
 		play();
 	}
 
 	// 上一曲
 	private void playLastMusic() {
 		int currentMusicIndex = list.indexOf(currentMusic);
-		Log.i(TAG, "playNextMusic currentMusicIndex = " + currentMusicIndex);
+		Log.i(TAG, "playLastMusic currentMusicIndex = " + currentMusicIndex);
 		// 如果当前是第一曲，则再上一曲就变为最后曲
 		if (--currentMusicIndex < 0) {
 			currentMusicIndex = list.size() - 1;
 		}
+		resetPlayParam(currentMusicIndex);
+		play();
+	}
+	
+	/**
+	 * 根据当前应该播放的曲目位置重置播放参数，
+	 */
+	private void resetPlayParam(int currentMusicIndex){
 		currentMusic = list.get(currentMusicIndex);
 		playing = false;
-		play();
+		currentDuration = currentMusic.getDuration();
+		currentPlayTime=0;
+		if(timer!=null){timer.cancel();}
 	}
 
 	@Override
