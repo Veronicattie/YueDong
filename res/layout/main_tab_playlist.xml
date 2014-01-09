@@ -27,7 +27,6 @@
             <ImageView
                 android:layout_width="30.0dip"
                 android:layout_height="30.0dip"
-                android:contentDescription="@string/content_description"
                 android:padding="8.0dip"
                 android:scaleType="fitCenter"
                 android:src="@drawable/add_play_list" />

@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"
-            android:text="@string/sdcard"
+            android:text="SDCARD"
             android:textColor="@color/main_blue_light"
             android:textSize="@dimen/small_size"
             />

@@ -38,7 +38,6 @@ public class PlayService extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -101,26 +100,6 @@ public class PlayService extends Service {
 		}
 		}
 	}
-	
-	private void playCurrent(){
-		while (true) {
-//			int currentDuration = mp.getCurrentPosition();
-//				sendBroadcast(new Intent(
-//						MediaPlayerManager.BROADCASTRECEVIER_ACTON)
-//						.putExtra("flag",
-//								MediaPlayerManager.FLAG_CHANGED)
-//						.putExtra("currentPosition", currentDuration)
-//						.putExtra("duration", mPlayer.getDuration()));
-//				updateWidget(false,currentDuration,mPlayer.getDuration());
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		}
-	}
-
 	private class errorListener implements OnErrorListener {
 
 		@Override

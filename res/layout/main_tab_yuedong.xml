@@ -33,7 +33,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/not_favorite"
-                android:contentDescription="@string/content_description"
                 />
         </LinearLayout>
 
@@ -64,7 +63,7 @@
         android:layout_weight="2.6" >
 
         <ImageView
-            android:id="@+id/miniplayer_iv_cd"
+            android:id="@+id/yuedong_iv_cd"
             android:layout_width="200dp"
             android:layout_height="230dp"
             android:layout_centerHorizontal="true"

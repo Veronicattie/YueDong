@@ -3,117 +3,168 @@ package com.hch.yuedong.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.ActionBar.Tab;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.widget.ImageView;
 
 import com.hch.yuedong.R;
 import com.hch.yuedong.adapter.TabPagerAdapter;
+import com.hch.yuedong.db.MusicDB;
 import com.hch.yuedong.entity.Music;
-import com.hch.yuedong.manage.MusicDB;
 import com.hch.yuedong.widget.LocalMusicFragment;
+import com.hch.yuedong.widget.MenuFragment;
+import com.hch.yuedong.widget.MySlidView;
 import com.hch.yuedong.widget.PlayListFragment;
+import com.hch.yuedong.widget.SlidFragment;
 import com.hch.yuedong.widget.YueDongFragment;
 
-public class MainActivity extends SherlockFragmentActivity implements
-		ActionBar.TabListener, OnPageChangeListener, BaseActivity {
-	/**
-	 * 顶部Tab的title
-	 */
-	private String[] mTabTitles;
+import com.viewpagerindicator.TabPageIndicator;
 
-	/**
-	 * ViewPager对象的引用
-	 */
-	private ViewPager mViewPager;
 
+public class MainActivity extends FragmentActivity {
 	/**
-	 * 装载Fragment的容器，我们的每一个界面都是一个Fragment
+	 * Tab标题
 	 */
-	private List<Fragment> mFragmentList;
-
-	/**
-	 * ActionBar对象的引用
-	 */
-	private ActionBar mActionBar;
+	private static final String[] TITLE = new String[] { "本地音乐", "网络音乐", "下载管理" };
+	
+	
+	private ArrayList<Fragment> mFragmentList;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.ac_main);
 		init();
+		MyApplication.getInstance().addActivity(this);
 	}
 	
+	
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		// TODO Auto-generated method stub
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle(R.string.exit_title);
+			builder.setMessage(R.string.exit_info);
+			builder.setPositiveButton(R.string.confirm,
+					new android.content.DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+							MyApplication.getInstance().AppExit();
+						}
+					});
+			builder.setNegativeButton(R.string.cancel,
+					new android.content.DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+						}
+					});
+			Dialog noticeDialog = builder.create();
+			noticeDialog.show();
+		}
+		return false;
+	}
 
 	public void init() {
 		// 将Fragment加入List中
 		mFragmentList = new ArrayList<Fragment>();
 		Fragment localMusicFragment = new LocalMusicFragment();
 		Fragment playListFragment = new PlayListFragment();
-		Fragment yueDongFragmetn = new YueDongFragment();
+		Fragment yueDongFragmetn = new YueDongFragment();	
 		mFragmentList.add(yueDongFragmetn);
 		mFragmentList.add(playListFragment);
 		mFragmentList.add(localMusicFragment);
+		
+		//ViewPager的adapter
+		FragmentPagerAdapter adapter = new TabPageIndicatorAdapter(getSupportFragmentManager());
+        ViewPager pager = (ViewPager)findViewById(R.id.viewPager);
+        pager.setAdapter(adapter);
 
-		// 将list放入Adapter中，用到ViewPager里去显示
-		mViewPager = (ViewPager) findViewById(R.id.viewPager);
-		mViewPager.setAdapter(new TabPagerAdapter(getSupportFragmentManager(),
-				mFragmentList));
-		mViewPager.setOnPageChangeListener(this);
-		
-		
-		//设置ActionBar
-		mActionBar = getSupportActionBar();
-		mActionBar.setDisplayShowTitleEnabled(false);
-		mActionBar.setDisplayShowHomeEnabled(false);
-		mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		
-		// 为ActionBar添加Tab并设置TabListener
-		mTabTitles = getResources().getStringArray(R.array.tab_title);
-		for (int i = 0; i < mTabTitles.length; i++) {
-			ActionBar.Tab tab = mActionBar.newTab();
-			tab.setText(mTabTitles[i]);
-			tab.setTabListener(this);
-			mActionBar.addTab(tab, i);
+        //实例化TabPageIndicator然后设置ViewPager与之关联
+        TabPageIndicator indicator = (TabPageIndicator)findViewById(R.id.indicator);
+        indicator.setViewPager(pager);
+        
+        ImageView iv_slidmenu = (ImageView) this.findViewById(R.id.headerbar_iv_slidmenu);
+        iv_slidmenu.setOnClickListener(new SlidMenuClickListener());
+	}
+	
+
+	private class SlidMenuClickListener implements OnClickListener{
+
+		@Override
+		public void onClick(View v) {
+			MySlidView mSlidView = (MySlidView)findViewById(R.id.slid_view);
+			
+			mSlidView.setMenuView(getLayoutInflater().inflate(R.layout.menu_fragment, null));
+			mSlidView.setSlidView(getLayoutInflater().inflate(R.layout.slid_fragment, null));
+
+			FragmentTransaction ft = MainActivity.this.getSupportFragmentManager().beginTransaction();
+			
+			MenuFragment menuFragment = new MenuFragment();
+			ft.replace(R.id.menu_fragment, menuFragment);
+			
+			SlidFragment slidFragment = new SlidFragment();
+			ft.replace(R.id.slid_fragment, slidFragment);
+			
+			ft.commit();
 		}
+		
 	}
+	
+	/**
+	 * ViewPager适配器
+	 * @author len
+	 *
+	 */
+    class TabPageIndicatorAdapter extends FragmentPagerAdapter {
+        public TabPageIndicatorAdapter(FragmentManager fm) {
+            super(fm);
+        }
 
+        @Override
+        public Fragment getItem(int position) {
+        	//新建一个Fragment来展示ViewPager item的内容，并传递参数
+        	Fragment fragment = mFragmentList.get(position);
+            Bundle args = new Bundle();  
+            args.putString("arg", TITLE[position]);  
+            fragment.setArguments(args);  
+        	
+            return fragment;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return TITLE[position % TITLE.length];
+        }
+
+        @Override
+        public int getCount() {
+            return TITLE.length;
+        }
+    }
+	
 	@Override
-	public void onTabSelected(Tab tab, FragmentTransaction ft) {
-		// 点击ActionBar Tab的时候切换不同的Fragment界面
-		mViewPager.setCurrentItem(tab.getPosition());
-	}
-
-	@Override
-	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-
-	}
-
-	@Override
-	public void onTabReselected(Tab tab, FragmentTransaction ft) {
-
-	}
-
-	@Override
-	public void onPageScrollStateChanged(int arg0) {
-
-	}
-
-	@Override
-	public void onPageScrolled(int arg0, float arg1, int arg2) {
-
-	}
-
-	@Override
-	public void onPageSelected(int arg0) {
-		// 滑动ViewPager的时候设置相对应的ActionBar Tab被选中
-		mActionBar.setSelectedNavigationItem(arg0);
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		this.unregisterReceiver(YueDongFragment.receiver);
 	}
 
 }

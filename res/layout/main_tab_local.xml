@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/main_background"
+    >
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        >
+        <TextView
+            android:id="@+id/localmusic_tv_totalmusic"
+            android:layout_width="0.0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="@string/play_by_shuffle"
+            android:textColor="@color/main_blue_light"
+            android:textSize="@dimen/small_size"
+            />
+        
+    </LinearLayout>
+    
+    <View 
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/main_blue_light"
+        />
+    
+    <ListView
+        android:id="@+id/localmusic_lv_musiclist"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@color/main_blue_light"
+        android:dividerHeight="1dp"
+        ></ListView>
+
+</LinearLayout>

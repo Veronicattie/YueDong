@@ -4,31 +4,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.hch.yuedong.R;
 import com.hch.yuedong.adapter.LocalMusicListAdapter;
+import com.hch.yuedong.db.MusicDB;
 import com.hch.yuedong.entity.Music;
-import com.hch.yuedong.manage.MusicDB;
 import com.hch.yuedong.util.FontUtil;
 
-public class LocalMusicFragment extends SherlockFragment{
+public class LocalMusicFragment extends Fragment{
 	
 	List<Music> list  = new ArrayList<Music>();
+	
+	View contextView=null;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		if(contextView==null){
+			contextView = inflater.inflate(R.layout.main_tab_localmusic, container, false);
+			list =MusicDB.scanAllAudioFiles(contextView.getContext());
+			initTotalMusicView(contextView);
+			initListView(contextView);
+		}
 		
-		View contextView = inflater.inflate(R.layout.main_tab_localmusic, container, false);
-		list =MusicDB.scanAllAudioFiles(contextView.getContext());
-		initTotalMusicView(contextView);
-		initListView(contextView);
+		ViewGroup parent = (ViewGroup) contextView.getParent();
+		if (parent != null) {
+			parent.removeView(contextView);
+		}
 		return contextView;
 	}
 	

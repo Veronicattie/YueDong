@@ -2,6 +2,7 @@ package com.hch.yuedong.widget;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -17,35 +18,39 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.google.gson.Gson;
 import com.hch.yuedong.R;
+import com.hch.yuedong.db.CurrentInfoManage;
+import com.hch.yuedong.db.MusicDB;
 import com.hch.yuedong.entity.CurrentInfo;
 import com.hch.yuedong.entity.Music;
-import com.hch.yuedong.manage.CurrentInfoManage;
-import com.hch.yuedong.manage.MusicDB;
 import com.hch.yuedong.service.PlayService;
 import com.hch.yuedong.ui.MyApplication;
 import com.hch.yuedong.util.FontUtil;
 
-public class YueDongFragment extends SherlockFragment implements
+public class YueDongFragment extends Fragment implements
 		OnClickListener {
 	private static final String TAG = "YueDongFragment";
-	public static final int SINGLE_CYCLE = 0;
-	public static final int SEQUENCE_PLAY = 1;
-	public static final int RANDOM_PLAY = 2;
+	public static final int MODE_LIST_ONCE = 0;
+	public static final int MODE_LOOP_LIST = 1;
+	public static final int MODE_SHUFFLE = 2;
+	public static final int MODE_SINGLE = 3;
 
 	ImageButton ib_set_as_favor = null;
 	ImageView iv_play = null;
@@ -53,6 +58,7 @@ public class YueDongFragment extends SherlockFragment implements
 	ImageView iv_play_last = null;
 	ImageView iv_play_mode = null;
 	ImageView iv_voice = null;
+	ImageView iv_cd = null;
 	TextView tv_music_name = null;
 	TextView tv_artist = null;
 	TextView tv_album = null;
@@ -60,32 +66,47 @@ public class YueDongFragment extends SherlockFragment implements
 	TextView tv_current_time = null;
 	SeekBar skb_progress = null;
 	
-
+	View contextView = null;
 	Context context = null;
 	MediaPlayer mediaPlayer = null;
 	Intent serviceIntent = null;
-	PlayReciever receiver = null;
+	public static PlayReciever receiver = null;
 
 	ArrayList<Music> list = new ArrayList<Music>();
 	// 默认播放模式为顺序播放
-	private int play_mode = 1;
+	private int play_mode = MODE_LIST_ONCE;
 	// 默认播放列表中的第一首歌
 	private Music currentMusic = null;
 	private boolean playing = false;
 	private int currentPlayTime=0;
 	private int currentDuration = 0;
+	private int totalMusic = 0;
 	private Timer timer;
+	private Boolean clickNextOrLast = false;
 	
 	
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View contextView = inflater.inflate(R.layout.main_tab_yuedong,
-				container, false);
-		initData(contextView);
-		initView(contextView);
-		initViewData();
+		if(contextView == null){
+			contextView = inflater.inflate(R.layout.main_tab_yuedong,
+					container, false);
+			initView(contextView);
+			initData(contextView);
+		}
+		
+		ViewGroup parent = (ViewGroup) contextView.getParent();
+		if (parent != null) {
+			parent.removeView(contextView);
+		}
+		
+		receiver = new PlayReciever();
+		//注册广播
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(PlayService.MUSIC_COMPLETED);
+		this.getActivity().registerReceiver(receiver, filter);
+		
 		Log.i(TAG, "onCreateView");
 		return contextView;
 	}
@@ -93,26 +114,41 @@ public class YueDongFragment extends SherlockFragment implements
 	@Override
 	public void onPause() {
 		super.onPause();
-		// 将当前音乐的信息记录到sp中去，因为用户可能就直接退出了
+		//skb_progress.
+		
 	}
 	
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if(timer!=null)
-		timer.cancel();
+		Log.i(TAG, "onDestroy");
+	}	
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		Log.i(TAG, "onDetach");
 	}
+
 	
 	public void initData(View contextView){
 		context = contextView.getContext();
 		mediaPlayer = new MediaPlayer();
 		list = MusicDB.scanAllAudioFiles(contextView.getContext());
 		currentMusic = list.get(0);
-		receiver = new PlayReciever();
-		//注册广播
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(PlayService.MUSIC_COMPLETED);
-		this.getActivity().registerReceiver(receiver, filter);
+		currentDuration = list.get(0).getDuration();
+		totalMusic = list.size();
+		
+		// 每次先加载sp中的数据，显示到主页上，
+				SharedPreferences sp = context.getSharedPreferences(
+						CurrentInfoManage.SP_NAME, Context.MODE_PRIVATE);
+				String info = sp.getString(CurrentInfoManage.SP_NAME, "");
+				if (!info.equals("")) {
+					Gson gson = new Gson();
+					CurrentInfo currentInfo = gson.fromJson(info, CurrentInfo.class);
+					play_mode = currentInfo.getPlay_mode();
+					currentMusic = currentInfo.getCurrent_music();
+					setMusicData(currentMusic);
+				}
 	}
 
 	public void initView(View view) {
@@ -123,6 +159,7 @@ public class YueDongFragment extends SherlockFragment implements
 		iv_play_last = (ImageView) view.findViewById(R.id.yuedong_iv_play_last);
 		iv_voice = (ImageView) view.findViewById(R.id.yuedong_iv_voice);
 		iv_play_mode = (ImageView) view.findViewById(R.id.yuedong_iv_play_mode);
+		iv_cd = (ImageView) view.findViewById(R.id.yuedong_iv_cd);
 		tv_music_name = (TextView) view
 				.findViewById(R.id.yuedong_tv_music_name);
 		tv_artist = (TextView) view.findViewById(R.id.yuedong_tv_artist);
@@ -144,20 +181,6 @@ public class YueDongFragment extends SherlockFragment implements
 		fontUtil.changeViewSize((ViewGroup)view);
 	}
 
-	public void initViewData() {
-		// 每次先加载sp中的数据，显示到主页上，
-		SharedPreferences sp = context.getSharedPreferences(
-				CurrentInfoManage.SP_NAME, Context.MODE_PRIVATE);
-		String info = sp.getString(CurrentInfoManage.SP_NAME, "");
-		if (!info.equals("")) {
-			Gson gson = new Gson();
-			CurrentInfo currentInfo = gson.fromJson(info, CurrentInfo.class);
-			play_mode = currentInfo.getPlay_mode();
-			currentMusic = currentInfo.getCurrent_music();
-			setMusicData(currentMusic);
-		}
-	}
-
 	private void setMusicData(Music music) {
 		tv_music_name.setText(currentMusic.getName());
 		tv_artist.setText(currentMusic.getArtist());
@@ -166,26 +189,60 @@ public class YueDongFragment extends SherlockFragment implements
 		skb_progress.setMax(currentDuration);
 	}
 
+	private void discRotate(){
+		Animation rotate = AnimationUtils.loadAnimation(context, R.anim.disc_rotate);
+		 LinearInterpolator lin = new LinearInterpolator(); // 设置旋转速度 此处设置为匀速旋转
+		 rotate.setInterpolator(lin);//将旋转速度配置给动画。
+		 iv_cd.startAnimation(rotate);
+	}
+	
+	private void stopRotate(){
+		iv_cd.clearAnimation();
+	}
 	
 	@Override
 	public void onClick(View view) {
 		switch (view.getId()) {
+		case R.id.yuedong_iv_play_mode:
+			changePlayMode();
+			break;
 		case R.id.yuedong_ib_set_as_favor:
 			break;
 		case R.id.yuedong_iv_play:
 			play();
 			break;
 		case R.id.yuedong_iv_play_last:
+			clickNextOrLast = true;
 			playLastMusic();
 			break;
 		case R.id.yuedong_iv_play_next:
+			clickNextOrLast = true;
 			playNextMusic();
 			break;
 		}
 	}
-
+	
+	private void changePlayMode(){
+		if(play_mode==MODE_LIST_ONCE){
+			iv_play_mode.setImageResource(R.drawable.play_mode_loop_list);
+			play_mode=MODE_LOOP_LIST;
+			Toast.makeText(context, "列表循环", Toast.LENGTH_SHORT).show();
+		}else if(play_mode==MODE_LOOP_LIST){
+			iv_play_mode.setImageResource(R.drawable.play_mode_shuffle);
+			play_mode=MODE_SHUFFLE;
+			Toast.makeText(context, "随机播放", Toast.LENGTH_SHORT).show();
+		}else if(play_mode==MODE_SHUFFLE){
+			iv_play_mode.setImageResource(R.drawable.play_mode_single);
+			play_mode=MODE_SINGLE;
+			Toast.makeText(context, "单曲循环", Toast.LENGTH_SHORT).show();
+		}else if(play_mode ==MODE_SINGLE){
+			iv_play_mode.setImageResource(R.drawable.play_mode_list_once);
+			play_mode=MODE_LIST_ONCE;
+			Toast.makeText(context, "列表播放", Toast.LENGTH_SHORT).show();
+		}
+	}
 	private void play() {
-		
+		setMusicData(currentMusic);
 		serviceIntent = new Intent(context, PlayService.class);
 		serviceIntent.putExtra("music", currentMusic);
 		serviceIntent.putExtra("playing", playing);
@@ -194,14 +251,16 @@ public class YueDongFragment extends SherlockFragment implements
 		context.startService(serviceIntent);
 		if (playing) {// 当前是正在播放的,歌曲将暂停，图标将变成使音乐播放
 			playing = false;
-			iv_play.setImageResource(R.drawable.selector_play);
+			stopRotate();
 			if(timer!=null){timer.cancel();}
 		} else {// 当前是暂停状态的，歌曲将播放，图标将变成使音乐暂停
 			playing = true;
+			discRotate();
 			iv_play.setImageResource(R.drawable.selector_stop);
+			
 			startAutoPlay();
 		}
-		setMusicData(currentMusic);
+		
 	}
 
 	public void startAutoPlay() {
@@ -216,8 +275,7 @@ public class YueDongFragment extends SherlockFragment implements
 					handler.post(new Runnable() {
 						@Override
 						public void run() {
-							
-								setPlayingMusicData();
+							setPlayingMusicData();
 						}
 					});
 				}
@@ -226,6 +284,7 @@ public class YueDongFragment extends SherlockFragment implements
 	}
 	
 	private void setPlayingMusicData(){
+		Log.i(TAG, currentPlayTime+"");
 		skb_progress.setProgress(currentPlayTime);
 		String time = MusicDB.long2Date(currentPlayTime);
 		tv_current_time.setText(time);
@@ -241,35 +300,77 @@ public class YueDongFragment extends SherlockFragment implements
 			if (action.equals(PlayService.MUSIC_COMPLETED)) {
 				if(timer!=null){timer.cancel();}
 				currentPlayTime=0;
-				// 当前歌曲播放完成，自动跳到下一曲
+				clickNextOrLast = false;
 				playNextMusic();
 			}
 
 		}
 	}
+	
+	private void playAt(int position){
+		resetPlayParam(position);
+		play();
+	}
 
 	// 下一曲
 	private void playNextMusic() {
 		int currentMusicIndex = list.indexOf(currentMusic);
-		Log.i(TAG, "playNextMusic currentMusicIndex = " + currentMusicIndex);
-		// 如果当前已经到最后一曲，则再下一曲就变为第一曲
+		switch (play_mode) {
+		case MODE_LIST_ONCE:
+			if (++currentMusicIndex >= list.size() && (!clickNextOrLast)) {
+				//如果是最后一曲了，就暂停音乐
+				play();
+			}else{playNextPositionMusic(currentMusicIndex);}
+			break;
+		case MODE_LOOP_LIST:
+			playNextPositionMusic(currentMusicIndex);
+			break;
+		case MODE_SHUFFLE:
+			int position = (int)(Math.random()*totalMusic);
+			playAt(position);
+			break;
+		case MODE_SINGLE:
+			if(clickNextOrLast){playNextPositionMusic(currentMusicIndex);}
+			else{playAt(currentMusicIndex);}
+			break;
+		}
+	}
+	
+	private void playNextPositionMusic(int currentMusicIndex ){
 		if (++currentMusicIndex >= list.size()) {
 			currentMusicIndex = 0;
 		}
-		resetPlayParam(currentMusicIndex);
-		play();
+		playAt(currentMusicIndex);
+	}
+	
+	private void playLastPositionMusic(int currentMusicIndex){
+		if (--currentMusicIndex < 0) {
+			currentMusicIndex = list.size() - 1;
+		}
+		playAt(currentMusicIndex);
 	}
 
 	// 上一曲
 	private void playLastMusic() {
 		int currentMusicIndex = list.indexOf(currentMusic);
-		Log.i(TAG, "playLastMusic currentMusicIndex = " + currentMusicIndex);
-		// 如果当前是第一曲，则再上一曲就变为最后曲
-		if (--currentMusicIndex < 0) {
-			currentMusicIndex = list.size() - 1;
+		switch (play_mode) {
+		case MODE_LIST_ONCE:
+			if (--currentMusicIndex < 0 && (!clickNextOrLast)) {
+				play();
+			}else{playLastPositionMusic(currentMusicIndex);}
+			break;
+		case MODE_LOOP_LIST:
+			playLastPositionMusic(currentMusicIndex);
+			break;
+		case MODE_SHUFFLE:
+			int position = (int)(Math.random()*totalMusic);
+			playAt(position);
+			break;
+		case MODE_SINGLE:
+			if(clickNextOrLast){playLastPositionMusic(currentMusicIndex);}
+			else{playAt(currentMusicIndex);}
+			break;
 		}
-		resetPlayParam(currentMusicIndex);
-		play();
 	}
 	
 	/**
